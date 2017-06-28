@@ -15,10 +15,6 @@ const mongoose = require('mongoose');
 
 const app = express();
 
-// Point to routing controller modules
-const index = require('./routes/index');
-const users = require('./routes/users');
-
 // Establish DB connection
 const db = mongoose.connection;
 
@@ -26,8 +22,15 @@ const db = mongoose.connection;
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
 
-// Express middleware bindings
+// Point to routing controller modules. This allows routing to be handled outside the main module.
+// Controller modules must export their express.Router object
+const index = require('./routes/index');
+const users = require('./routes/users');
 
+app.use('/', index);
+app.use('/users', users);
+
+// Express middleware bindings
 app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(logger('dev'));
 app.use(bodyParser.json());
@@ -74,10 +77,6 @@ app.use(function (req, res, next) {
     res.locals.messages = require('express-messages')(req, res);
     next();
 });
-
-// Setup routing to use controllers
-app.use('/', index);
-app.use('/users', users);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

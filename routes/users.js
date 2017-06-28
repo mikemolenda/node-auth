@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const User = require('../models/user');
 const expressValidator = require('express-validator')
 
 router.use(expressValidator());
@@ -25,21 +26,6 @@ router.get('/login', function(req, res, next) {
 
 /* POST users/register */
 router.post('/register', upload.single('profilepic'), function(req, res, next) {
-    // Read form data
-    let name = req.body.name;
-    let email = req.body.email;
-    let username = req.body.username;
-    let password = req.body.password;
-    let passConf = req.body.passconf;
-
-    // Read image upload
-    if(req.file) {
-        let profileImage = req.file.filename;
-    } else {
-        console.log('No profile picture uploaded');
-        let profileImage = 'profile-default.jpg';
-    }
-
     // Validate form data
     req.checkBody('name', 'Name field is required').notEmpty();
     req.checkBody('email', 'Email field is required').notEmpty();
@@ -49,18 +35,52 @@ router.post('/register', upload.single('profilepic'), function(req, res, next) {
     req.checkBody('passconf', 'Password fields do not match').equals(req.body.password);
     req.checkBody('name', 'Name field is required').notEmpty();
 
+    // If form data valid, create new user object and redirect home, otherwise re-render form
     let errors = req.validationErrors();
 
     if (errors) {
         console.log('Invalid form data');
+
         res.render('register', {
             title: 'Register',
             errors: errors
         });
+
     } else {
         console.log('Form data OK');
-    }
 
+        // Create new object with form data
+        let name = req.body.name;
+        let email = req.body.email;
+        let username = req.body.username;
+        let password = req.body.password;
+        let profileImage = '';
+
+        // Read image upload
+        if(req.file) {
+            profileImage = req.file.filename;
+        } else {
+            console.log('No profile picture uploaded');
+            profileImage = 'profile-default.jpg';
+        }
+
+        let newUser = new User({
+            name: name,
+            email: email,
+            username: username,
+            password: password,
+            profileImage: profileImage
+        });
+
+        User.createUser(newUser, function(err, user) {
+            if(err) throw err;
+            console.log(user);
+        });
+
+        res.location('/');
+        res.redirect('/');
+
+    }
 
 });
 

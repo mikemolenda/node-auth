@@ -6,6 +6,7 @@ const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const session = require('express-session');
 const passport = require('passport');
+const expressValidator = require('express-validator');
 const localStrategy = require('passport-local').Strategy;
 const multer = require('multer');
 const flash = require('connect-flash');
@@ -25,7 +26,8 @@ const db = mongoose.connection;
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
 
-// Express bindings
+// Express middleware bindings
+
 app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(logger('dev'));
 app.use(bodyParser.json());
@@ -33,6 +35,47 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+// File uploads (user profile images) setup
+const upload = multer({dest: './uploads'});
+
+// Sessions setup
+app.use(session({
+    secret: 'secret',
+    saveUninitialized: true,
+    resave: true
+}));
+
+// Passport setup
+app.use(passport.initialize());
+app.use(passport.session());
+
+// Validator setup
+app.use(expressValidator({
+    errorFormatter: function(param, msg, value) {
+        let namespace = param.split('.');
+        let root = namespace.shift();
+        let formParam = root;
+
+        while(namespace.length) {
+            formParam += '[' + namespace.shift() + ']';
+        }
+
+        return {
+            param : formParam,
+            msg   : msg,
+            value : value
+        };
+    }
+}));
+
+// Express messages setup
+app.use(require('connect-flash')());
+app.use(function (req, res, next) {
+    res.locals.messages = require('express-messages')(req, res);
+    next();
+});
+
+// Setup routing to use controllers
 app.use('/', index);
 app.use('/users', users);
 

@@ -1,10 +1,26 @@
 {
   "name": "node-auth",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "private": true,
+  "description": "A user authentication system using Node.js, Express.js, and Passport",
   "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node ./bin/www"
   },
+
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mikemolenda/node-auth.git"
+  },
+
+  "author": "Mike Molenda",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mikemolenda/node-auth/issues"
+  },
+
+  "homepage": "https://github.com/mikemolenda/node-auth.git#readme",
+
   "dependencies": {
     "body-parser": "~1.17.1",
     "cookie-parser": "~1.4.3",
@@ -14,4 +30,5 @@
     "morgan": "~1.8.1",
     "serve-favicon": "~2.4.2"
   }
+
 }

@@ -7,20 +7,16 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node ./bin/www"
   },
-
   "repository": {
     "type": "git",
     "url": "git+https://github.com/mikemolenda/node-auth.git"
   },
-
   "author": "Mike Molenda",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/mikemolenda/node-auth/issues"
   },
-
   "homepage": "https://github.com/mikemolenda/node-auth.git#readme",
-
   "dependencies": {
     "body-parser": "~1.17.1",
     "cookie-parser": "~1.4.3",
@@ -39,5 +35,4 @@
     "passport-http": "^0.3.0",
     "multer": "^1.3.0"
   }
-
 }

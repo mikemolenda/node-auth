@@ -18,11 +18,11 @@ html(lang='en')
 
                 .navbar-collapse.collapse
                     ul.nav.navbar-nav
-                        li
+                        li(class=(title == 'Members Area' ? 'active' : ''))
                             a(href='/') Home
-                        li
+                        li(class=(title == 'Register' ? 'active' : ''))
                             a(href='/users/register') Register
-                        li
+                        li(class=(title == 'Login' ? 'active' : ''))
                             a(href='/users/login') Login
 
                     ul.nav.navbar-nav.navbar-right

@@ -1,7 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const User = require('../models/user');
-const expressValidator = require('express-validator')
+const expressValidator = require('express-validator');
+
 
 router.use(expressValidator());
 
@@ -76,6 +77,9 @@ router.post('/register', upload.single('profilepic'), function(req, res, next) {
             if(err) throw err;
             console.log(user);
         });
+
+        // Set confirmation message for redirect
+        req.flash('success', `Successfully registered user ${username}`);
 
         res.location('/');
         res.redirect('/');

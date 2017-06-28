@@ -6,4 +6,5 @@ router.get('/', function(req, res, next) {
     res.send('respond with a resource');
 });
 
+// Enable access from external modules
 module.exports = router;

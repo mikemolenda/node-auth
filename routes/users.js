@@ -39,6 +39,18 @@ passport.use(new LocalStrategy(function(username, password, done) {
 
 }));
 
+// Serialize user ID to session
+passport.serializeUser(function(user, done) {
+    done(null, user.id);
+});
+
+// Deserialize user from session by ID
+passport.deserializeUser(function(id, done) {
+    User.getUserById(id, function(err, user) {
+        done(err, user);
+    });
+});
+
 /* GET users listing */
 router.get('/', function(req, res, next) {
     res.send('respond with a resource');
@@ -59,16 +71,11 @@ router.post('/login',
     }
 );
 
-// Serialize user ID to session
-passport.serializeUser(function(user, done) {
-    done(null, user.id);
-});
-
-// Deserialize user from session by ID
-passport.deserializeUser(function(id, done) {
-    User.getUserById(id, function(err, user) {
-        done(err, user);
-    });
+/* GET users/logout */
+router.get('/logout', function(req, res) {
+    req.logout();
+    req.flash('success', 'Successfully logged out');
+    res.redirect('/users/login');
 });
 
 /* GET users/register */

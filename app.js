@@ -75,6 +75,13 @@ app.use(function (req, res, next) {
     next();
 });
 
+/* GET any page */
+app.get('*', function(req, res, next) {
+    // Pass user to response if exists - used to check login status
+    res.locals.user = req.user || null;
+    next();
+});
+
 // Set up routing
 // Note this must be placed after the middleware setup
 app.use('/', routes);

@@ -18,16 +18,22 @@ html(lang='en')
 
                 .navbar-collapse.collapse
                     ul.nav.navbar-nav
-                        li(class=(title == 'Members Area' ? 'active' : ''))
-                            a(href='/') Home
-                        li(class=(title == 'Register' ? 'active' : ''))
-                            a(href='/users/register') Register
-                        li(class=(title == 'Login' ? 'active' : ''))
-                            a(href='/users/login') Login
+                        // Show Members Area only if logged in
+                        if user
+                            li(class=(title == 'Members Area' ? 'active' : ''))
+                                a(href='/') Home
+                        // Show register and user pages only if not logged in
+                        if !user
+                            li(class=(title == 'Register' ? 'active' : ''))
+                                a(href='/users/register') Register
+                            li(class=(title == 'Login' ? 'active' : ''))
+                                a(href='/users/login') Login
 
                     ul.nav.navbar-nav.navbar-right
-                        li
-                            a(href='/users/logout') Logout
+                        // Show logout only if logged in
+                        if user
+                            li
+                                a(href='/users/logout') Logout
 
         .container
             != messages()

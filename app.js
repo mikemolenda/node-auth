@@ -7,7 +7,7 @@ const bodyParser = require('body-parser');
 const session = require('express-session');
 const passport = require('passport');
 const expressValidator = require('express-validator');
-const localStrategy = require('passport-local').Strategy;
+const LocalStrategy = require('passport-local').Strategy;
 const multer = require('multer');
 const flash = require('connect-flash');
 const mongo = require('mongodb');
@@ -18,17 +18,14 @@ const app = express();
 // Establish DB connection
 const db = mongoose.connection;
 
-// View engine setup
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'pug');
-
 // Point to routing controller modules. This allows routing to be handled outside the main module.
 // Controller modules must export their express.Router object
-const index = require('./routes/index');
+const routes = require('./routes/index');
 const users = require('./routes/users');
 
-app.use('/', index);
-app.use('/users', users);
+// Set up view engine
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'pug');
 
 // Express middleware bindings
 app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
@@ -41,18 +38,18 @@ app.use(express.static(path.join(__dirname, 'public')));
 // File uploads (user profile images) setup
 const upload = multer({dest: './uploads'});
 
-// Sessions setup
+// Set up Sessions
 app.use(session({
     secret: 'secret',
     saveUninitialized: true,
     resave: true
 }));
 
-// Passport setup
+// Set up Passport
 app.use(passport.initialize());
 app.use(passport.session());
 
-// Validator setup
+// Set up Express Validator
 app.use(expressValidator({
     errorFormatter: function(param, msg, value) {
         let namespace = param.split('.')
@@ -70,29 +67,43 @@ app.use(expressValidator({
     }
 }));
 
-// Express messages setup
-app.use(require('connect-flash')());
+// Set up Express Messages
+app.use(flash());
 app.use(function (req, res, next) {
     res.locals.messages = require('express-messages')(req, res);
     next();
 });
 
-// catch 404 and forward to error handler
+// Set up routing
+// Note this must be placed after the middleware setup
+app.use('/', routes);
+app.use('/users', users);
+
+// Catch 404 and forward to error handler
 app.use(function(req, res, next) {
     let err = new Error('Not Found');
     err.status = 404;
     next(err);
 });
 
-// error handler
-app.use(function(err, req, res, next) {
-    // set locals, only providing error in development
-    res.locals.message = err.message;
-    res.locals.error = req.app.get('env') === 'development' ? err : {};
+// Development error handler (prints stack trace)
+if (app.get('env') === 'development') {
+    app.use(function(err, req, res, next) {
+        res.status(err.status || 500);
+        res.render('error', {
+            message: err.message,
+            error: err
+        });
+    });
+}
 
-    // render the error page
+// Production error handler (no stack trace)
+app.use(function(err, req, res, next) {
     res.status(err.status || 500);
-    res.render('error');
+    res.render('error', {
+        message: err.message,
+        error: {}
+    });
 });
 
 module.exports = app;

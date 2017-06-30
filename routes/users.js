@@ -1,24 +1,10 @@
 const express = require('express');
 const router = express.Router();
-const User = require('../models/user');
-const expressValidator = require('express-validator');
-const session = require('express-session');
-const flash = require('connect-flash');
+const multer = require('multer');
 
-router.use(expressValidator());router.use(require('connect-flash')());
-router.use(function (req, res, next) {
-    res.locals.messages = require('express-messages')(req, res);
-    next();
-});
-router.use(session({
-    secret: 'secret',
-    saveUninitialized: true,
-    resave: true
-}));
-
+let User = require('../models/user');
 
 // Include multer to handle multipart form data (image upload)
-const multer = require('multer');
 const upload = multer({dest: './uploads'});
 
 /* GET users listing */

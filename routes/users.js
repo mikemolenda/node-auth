@@ -89,7 +89,7 @@ router.post('/register', upload.single('profilepic'), function(req, res, next) {
 
 /* POST users/login */
 router.post('/login',
-    passport.authenticate('local', {failureRedirect: '/users/login', failureFlash: 'Incorrect username or password'}),
+    passport.authenticate('local', {failureRedirect: '/users/login', failureFlash: true}),
     function(req, res) {
         // If this anonymous function gets called, authentication was successful
         req.flash('success', 'Successful login');

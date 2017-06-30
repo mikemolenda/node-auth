@@ -9,19 +9,71 @@ let User = require('../models/user');
 // Include multer to handle multipart form data (image upload)
 const upload = multer({dest: './uploads'});
 
+// Set up passport to use local DB for authentication
+passport.use(new LocalStrategy(function(username, password, done) {
+
+    User.getUserByUsername(username, function(err, user) {
+        if (err) {
+            throw err;
+        }
+
+        // If username not found, respond with message
+        if (!user) {
+            return done(null, false, {message: 'Username not found'});
+        }
+
+        // If user found, verify password
+        User.comparePassword(password, user.password, function(err, isMatch) {
+            if (err) {
+                return done(err);
+            }
+
+            // If passwords match login, otherwise respond with message
+            if (isMatch) {
+                return done(null, user);
+            } else {
+                return done(null, false, {message: 'Incorrect password'});
+            }
+        });
+    });
+
+}));
+
 /* GET users listing */
 router.get('/', function(req, res, next) {
     res.send('respond with a resource');
 });
 
-/* GET users/register */
-router.get('/register', function(req, res, next) {
-    res.render('register', {title: 'Register'});
-});
-
 /* GET users/login */
 router.get('/login', function(req, res, next) {
     res.render('login', {title: 'Login'});
+});
+
+/* POST users/login */
+router.post('/login',
+    passport.authenticate('local', {failureRedirect: '/users/login', failureFlash: true}),
+    function(req, res) {
+        // If this anonymous function gets called, authentication was successful
+        req.flash('success', 'Successful login');
+        res.redirect('/');
+    }
+);
+
+// Serialize user ID to session
+passport.serializeUser(function(user, done) {
+    done(null, user.id);
+});
+
+// Deserialize user from session by ID
+passport.deserializeUser(function(id, done) {
+    User.getUserById(id, function(err, user) {
+        done(err, user);
+    });
+});
+
+/* GET users/register */
+router.get('/register', function(req, res, next) {
+    res.render('register', {title: 'Register'});
 });
 
 /* POST users/register */
@@ -86,58 +138,6 @@ router.post('/register', upload.single('profilepic'), function(req, res, next) {
     }
 
 });
-
-/* POST users/login */
-router.post('/login',
-    passport.authenticate('local', {failureRedirect: '/users/login', failureFlash: true}),
-    function(req, res) {
-        // If this anonymous function gets called, authentication was successful
-        req.flash('success', 'Successful login');
-        res.redirect('/');
-    }
-);
-
-// Serialize user ID to session
-passport.serializeUser(function(user, done) {
-    done(null, user.id);
-});
-
-// Deserialize user from session by ID
-passport.deserializeUser(function(id, done) {
-    User.getUserById(id, function(err, user) {
-        done(err, user);
-    });
-});
-
-// Set up passport to use local DB for authentication
-passport.use(new LocalStrategy(function(username, password, done) {
-
-    User.getUserByUsername(username, function(err, user) {
-        if (err) {
-            throw err;
-        }
-
-        // If username not found, respond with message
-        if (!user) {
-            return done(null, false, {message: 'Username not found'});
-        }
-
-        // If user found, verify password
-        User.comparePassword(password, user.password, function(err, isMatch) {
-            if (err) {
-                return done(err);
-            }
-
-            // If passwords match login, otherwise respond with message
-            if (isMatch) {
-                return done(null, user);
-            } else {
-                return done(null, false, {message: 'Incorrect password'});
-            }
-        });
-    });
-
-}));
 
 // Enable access from external modules
 module.exports = router;

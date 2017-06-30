@@ -4,6 +4,6 @@ A user authentication system using Node.js, Express.js, and Passport ([passportj
 ## MongoDB server startup options
 Create directories /data/db and /log in MongoDB path root, then run:
 
-`$ mongod --directoryperdb --dbpath {mongodb-path}/data/db/ --logpath {mongodb-path}/log/mongodb.log --logappend --rest`
+`$ mongod --directoryperdb --dbpath ${mongo_path}/data/db/ --logpath ${mongo_path}/log/mongodb.log --logappend --rest`
 
 e.g. OS X MongoDB path might be /usr/local/opt/mongodb if installed with HomeBrew

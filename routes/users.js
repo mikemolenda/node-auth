@@ -9,48 +9,6 @@ let User = require('../models/user');
 // Include multer to handle multipart form data (image upload)
 const upload = multer({dest: './uploads'});
 
-// Set up passport to use local DB for authentication
-passport.use(new LocalStrategy(function(username, password, done) {
-
-    User.getUserByUsername(username, function(err, user) {
-        if (err) {
-            throw err;
-        }
-
-        // If username not found, respond with message
-        if (!user) {
-            return done(null, false, {message: 'Username not found'});
-        }
-
-        // If user found, verify password
-        User.comparePassword(password, user.password, function(err, isMatch) {
-            if (err) {
-                return done(err);
-            }
-
-            // If passwords match login, otherwise respond with message
-            if (isMatch) {
-                return done(null, user);
-            } else {
-                return done(null, false, {message: 'Incorrect password'});
-            }
-        });
-    });
-
-}));
-
-// Serialize user ID to session
-passport.serializeUser(function(user, done) {
-    done(null, user.id);
-});
-
-// Deserialize user from session by ID
-passport.deserializeUser(function(id, done) {
-    User.getUserById(id, function(err, user) {
-        done(err, user);
-    });
-});
-
 /* GET users listing */
 router.get('/', function(req, res, next) {
     res.send('respond with a resource');
@@ -144,6 +102,48 @@ router.post('/register', upload.single('profilepic'), function(req, res, next) {
 
     }
 
+});
+
+// Set up passport to use local DB for authentication
+passport.use(new LocalStrategy(function(username, password, done) {
+
+    User.getUserByUsername(username, function(err, user) {
+        if (err) {
+            throw err;
+        }
+
+        // If username not found, respond with message
+        if (!user) {
+            return done(null, false, {message: 'Username not found'});
+        }
+
+        // If user found, verify password
+        User.comparePassword(password, user.password, function(err, isMatch) {
+            if (err) {
+                return done(err);
+            }
+
+            // If passwords match login, otherwise respond with message
+            if (isMatch) {
+                return done(null, user);
+            } else {
+                return done(null, false, {message: 'Incorrect password'});
+            }
+        });
+    });
+
+}));
+
+// Serialize user ID to session
+passport.serializeUser(function(user, done) {
+    done(null, user.id);
+});
+
+// Deserialize user from session by ID
+passport.deserializeUser(function(id, done) {
+    User.getUserById(id, function(err, user) {
+        done(err, user);
+    });
 });
 
 // Enable access from external modules

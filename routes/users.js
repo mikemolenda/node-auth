@@ -9,13 +9,24 @@ let User = require('../models/user');
 // Include multer to handle multipart form data (image upload)
 const upload = multer({dest: './uploads'});
 
-/* GET users listing */
-router.get('/', function(req, res, next) {
-    res.send('respond with a resource');
+/* Check user authentication */
+function ensureLoggedOut(req, res, next) {
+    // Continue if user is logged out
+    if(!req.isAuthenticated()) {
+        return next();
+    }
+
+    // Otherwise redirect to main page
+    res.redirect('/');
+}
+
+/* GET users index */
+router.get('/', ensureLoggedOut, function(req, res, next) {
+    res.redirect('/users/login');
 });
 
 /* GET users/login */
-router.get('/login', function(req, res, next) {
+router.get('/login', ensureLoggedOut, function(req, res, next) {
     res.render('login', {title: 'Login'});
 });
 
@@ -37,7 +48,7 @@ router.get('/logout', function(req, res) {
 });
 
 /* GET users/register */
-router.get('/register', function(req, res, next) {
+router.get('/register', ensureLoggedOut, function(req, res, next) {
     res.render('register', {title: 'Register'});
 });
 
